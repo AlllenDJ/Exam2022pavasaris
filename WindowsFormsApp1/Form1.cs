@@ -16,6 +16,8 @@ namespace WindowsFormsApp1
     {
         private string ebayUrl = "https://www.ebay.com";
         private Stack<string> searchHistory = new Stack<string>();
+        private Process browserProcess;
+
 
         public Form1()
         {
@@ -62,24 +64,49 @@ namespace WindowsFormsApp1
 
         private void closeBrowserButton_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Cannot programmatically close browser tabs. Please close it manually.");
+            if (browserProcess != null && !browserProcess.HasExited)
+            {
+                try
+                {
+                    browserProcess.Kill();
+                    browserProcess.Dispose();
+                    browserProcess = null;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Failed to close browser: " + ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Browser is already closed or was not opened from this app.");
+            }
         }
 
         private void OpenInBrowser(string url)
         {
             try
             {
-#if NETCOREAPP || NET5_0_OR_GREATER
-                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-#else
-                Process.Start(url); // For .NET Framework
-#endif
+                // If a browser was already opened, kill it before opening a new one
+                if (browserProcess != null && !browserProcess.HasExited)
+                {
+                    browserProcess.Kill();
+                    browserProcess.Dispose();
+                }
+
+                // Launch Chrome — make sure Chrome is installed and added to the PATH
+                browserProcess = Process.Start(new ProcessStartInfo
+                {
+                    FileName = "chrome", // or "msedge", "firefox"
+                    Arguments = url,
+                    UseShellExecute = true
+                });
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error opening browser: " + ex.Message);
             }
-        }
 
+        }
     }
 }
