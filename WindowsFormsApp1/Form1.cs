@@ -37,7 +37,6 @@ namespace WindowsFormsApp1
                 string searchUrl = $"{ebayUrl}/sch/i.html?_nkw={Uri.EscapeDataString(query)}";
                 OpenInBrowser(searchUrl);
 
-                // Store to stack and RichTextBox
                 searchHistory.Push(searchUrl);
                 searchResultLinkTextBox.Text = searchUrl;
 
@@ -49,7 +48,7 @@ namespace WindowsFormsApp1
         {
             if (searchHistory.Count > 0)
             {
-                searchHistory.Pop(); // Remove current
+                searchHistory.Pop();
                 string previousUrl = searchHistory.Count > 0 ? searchHistory.Peek() : ebayUrl;
                 OpenInBrowser(previousUrl);
             }
@@ -87,17 +86,16 @@ namespace WindowsFormsApp1
         {
             try
             {
-                // If a browser was already opened, kill it before opening a new one
                 if (browserProcess != null && !browserProcess.HasExited)
                 {
                     browserProcess.Kill();
                     browserProcess.Dispose();
                 }
 
-                // Launch Chrome — make sure Chrome is installed and added to the PATH
+     
                 browserProcess = Process.Start(new ProcessStartInfo
                 {
-                    FileName = "chrome", // or "msedge", "firefox"
+                    FileName = "chrome", 
                     Arguments = url,
                     UseShellExecute = true
                 });
